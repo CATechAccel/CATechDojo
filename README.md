@@ -3,7 +3,7 @@ CA Tech Dojo: https://techbowl.co.jp/techtrain/missions/12
 
 ## API仕様書
 1. https://editor.swagger.io/ を開く
-2. https://github.com/CATechAccel/swagger.yml の内容をコピーして貼り付ける
+2. https://github.com/CATechAccel/CATechDojo/blob/main/swagger.yml の内容をコピーして貼り付ける
 
 ▼swagger.ymlの内容
 ``` yml
