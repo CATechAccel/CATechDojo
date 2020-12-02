@@ -2,12 +2,6 @@ package user
 
 import "CATechDojo/db"
 
-type UserData struct {
-	UserID    string `json:"user_id"`
-	AuthToken string `json:"auth_token"`
-	Name      string `json:"name"`
-}
-
 func SelectAllUser() ([]UserData, error) {
 	rows, err := db.DBInstance.Query("SELECT * FROM user")
 	if err != nil {
