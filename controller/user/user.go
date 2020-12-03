@@ -7,7 +7,9 @@ import (
 )
 
 func GetAllUser(w http.ResponseWriter, r *http.Request) {
-	users, err := user.SelectAllUser()
+	u := user.New()
+
+	users, err := u.SelectAllUser()
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}

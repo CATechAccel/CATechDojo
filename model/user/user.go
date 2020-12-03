@@ -2,7 +2,18 @@ package user
 
 import "CATechDojo/db"
 
-func SelectAllUser() ([]UserData, error) {
+//インターフェースを定義
+type userInterface interface {
+	SelectAllUser() ([]UserData, error)
+}
+
+//定義したインターフェースを満たすインスタンスを生成する関数を定義
+func New() userInterface {
+	return &UserData{}
+}
+
+//インスタンスが持つ関数（メソッド）を定義
+func (u *UserData) SelectAllUser() ([]UserData, error) {
 	rows, err := db.DBInstance.Query("SELECT * FROM user")
 	if err != nil {
 		return nil, err
