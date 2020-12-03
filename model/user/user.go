@@ -5,6 +5,8 @@ import "CATechDojo/db"
 //インターフェースを定義
 type userInterface interface {
 	SelectAllUser() ([]UserData, error)
+	InsertUserData(UserData)
+	UpdateUserData(UserData) (UserData, error)
 }
 
 //定義したインターフェースを満たすインスタンスを生成する関数を定義
@@ -28,5 +30,12 @@ func (u *UserData) SelectAllUser() ([]UserData, error) {
 		userSlice = append(userSlice, u)
 	}
 	return userSlice, nil
+}
 
+func (u *UserData) InsertUserData(data UserData) {
+	panic("implement me")
+}
+
+func (u *UserData) UpdateUserData(data UserData) (UserData, error) {
+	panic("implement me")
 }
