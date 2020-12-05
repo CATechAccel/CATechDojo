@@ -3,6 +3,7 @@ package user
 import (
 	"CATechDojo/model/user"
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -13,6 +14,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	userinfo, err := u.SelectUser(token)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
 
