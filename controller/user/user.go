@@ -6,10 +6,12 @@ import (
 	"net/http"
 )
 
-func GetAllUser(w http.ResponseWriter, r *http.Request) {
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("x-token")
+
 	u := user.New()
 
-	users, err := u.SelectAllUser()
+	userinfo, err := u.SelectUser(token)
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
@@ -17,7 +19,7 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 
-	data, err := json.Marshal(users)
+	data, err := json.Marshal(userinfo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
