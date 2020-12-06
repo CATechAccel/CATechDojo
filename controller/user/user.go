@@ -47,13 +47,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	userID, err := createUserID()
+	userID, err := createUUID()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	authToken, err := createAuthToken()
+	authToken, err := createUUID()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -77,20 +77,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func createUserID() (string, error) {
-	id, err := uuid.NewRandom()
+func createUUID() (string, error) {
+	uuid, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
 	}
 
-	return id.String(), nil
-}
-
-func createAuthToken() (string, error) {
-	token, err := uuid.NewRandom()
-	if err != nil {
-		return "", err
-	}
-
-	return token.String(), nil
+	return uuid.String(), nil
 }
