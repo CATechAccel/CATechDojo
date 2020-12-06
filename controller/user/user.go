@@ -75,7 +75,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	_, _ = w.Write(data)
-
 }
 
 func createUserID() (string, error) {
