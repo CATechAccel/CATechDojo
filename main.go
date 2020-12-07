@@ -15,6 +15,7 @@ func main() {
 	//MethodsメソッドでHTTPメソッドの種類を指定
 	r.HandleFunc("/health", health.HealthCheck).Methods("GET")
 	r.HandleFunc("/user", user.GetAllUser).Methods("GET")
+	r.HandleFunc("/user/update", user.ChangeUser).Methods("PUT")
 
 	http.ListenAndServe(":8080", r)
 }
