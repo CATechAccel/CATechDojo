@@ -16,6 +16,7 @@ func main() {
 	r.HandleFunc("/health", health.HealthCheck).Methods("GET")
 	r.HandleFunc("/user", user.GetAllUser).Methods("GET")
 	r.HandleFunc("/user/update", user.ChangeUser).Methods("PUT")
+	r.HandleFunc("/user/create", user.CreateUser).Methods("POST")
 
 	http.ListenAndServe(":8080", r)
 }
