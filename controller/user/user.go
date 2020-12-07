@@ -35,18 +35,20 @@ func ChangeUser(w http.ResponseWriter, r *http.Request) {
 
 	buf := new(bytes.Buffer)
 	if _, err := io.Copy(buf, body); err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		funcErr(err, w)
 	}
 
 	var reqBody user.UserData
 	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		funcErr(err, w)
 	}
 
 	if err := reqBody.UpdateUser(token); err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		funcErr(err, w)
 	}
+}
+
+func funcErr(err error, w http.ResponseWriter) {
+	log.Println(err)
+	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
