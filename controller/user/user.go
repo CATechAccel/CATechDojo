@@ -2,9 +2,13 @@ package user
 
 import (
 	"CATechDojo/model/user"
+	"bytes"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
@@ -23,7 +27,63 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	data, err := json.Marshal(userinfo)
 	if err != nil {
+		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	_, _ = w.Write(data)
+}
+
+func CreateUser(w http.ResponseWriter, r *http.Request) {
+	body := r.Body
+	defer body.Close()
+
+	buf := new(bytes.Buffer)
+	if _, err := io.Copy(buf, body); err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	var reqBody user.UserData
+	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	userID, err := createUUID()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	authToken, err := createUUID()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	reqBody.UserID = userID
+	reqBody.AuthToken = authToken
+
+	if err := reqBody.InsertUser(); err != nil {
+		log.Println(err)
+		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	data, err := json.Marshal(reqBody)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	_, _ = w.Write(data)
+}
+
+func createUUID() (string, error) {
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return "", err
+	}
+
+	return uuid.String(), nil
 }

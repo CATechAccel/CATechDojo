@@ -7,7 +7,7 @@ import (
 //インターフェースを定義
 type userInterface interface {
 	SelectUser(string) (*UserData, error)
-	InsertUser(UserData)
+	InsertUser() error
 	UpdateUser(UserData) (UserData, error)
 }
 
@@ -25,8 +25,11 @@ func (u *UserData) SelectUser(token string) (*UserData, error) {
 	return u, nil
 }
 
-func (u *UserData) InsertUser(data UserData) {
-	panic("implement me")
+func (u *UserData) InsertUser() error {
+	if _, err := db.DBInstance.Exec("INSERT INTO user(user_id, auth_token, name) VALUES (?, ?, ?)", u.UserID, u.AuthToken, u.Name); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (u *UserData) UpdateUser(data UserData) (UserData, error) {
