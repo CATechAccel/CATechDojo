@@ -6,7 +6,7 @@ import "CATechDojo/db"
 type userInterface interface {
 	SelectAllUser() ([]UserData, error)
 	InsertUser(UserData)
-	UpdateUser(UserData) (UserData, error)
+	UpdateUser(string) error
 }
 
 //定義したインターフェースを満たすインスタンスを生成する関数を定義
@@ -36,6 +36,9 @@ func (u *UserData) InsertUser(data UserData) {
 	panic("implement me")
 }
 
-func (u *UserData) UpdateUser(data UserData) (UserData, error) {
-	panic("implement me")
+func (u *UserData) UpdateUser(token string) error {
+	if _, err := db.DBInstance.Exec("UPDATE user SET name = ? WHERE auth_token = ?", u.Name, token); err != nil {
+		return err
+	}
+	return nil
 }
