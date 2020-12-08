@@ -6,6 +6,7 @@ import (
 
 //インターフェースを定義
 type userInterface interface {
+	SelectAllUser() ([]UserData, error)
 	SelectUser(string) error
 	InsertUser() error
 	UpdateUser(UserData) (UserData, error)
@@ -17,6 +18,23 @@ func New() userInterface {
 }
 
 //インスタンスが持つ関数（メソッド）を定義
+func (u *UserData) SelectAllUser() ([]UserData, error) {
+	rows, err := db.DBInstance.Query("SELECT * FROM user")
+	if err != nil {
+		return nil, err
+	}
+
+	userSlice := make([]UserData, 0)
+	for rows.Next() {
+		var u UserData
+		if err := rows.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {
+			return nil, err
+		}
+		userSlice = append(userSlice, u)
+	}
+	return userSlice, nil
+}
+
 func (u *UserData) SelectUser(token string) error {
 	row := db.DBInstance.QueryRow("SELECT * FROM user WHERE auth_token = ?", token)
 	if err := row.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {
