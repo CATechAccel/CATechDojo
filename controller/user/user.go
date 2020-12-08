@@ -14,7 +14,7 @@ import (
 func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	u := user.New()
 
-	users, err := u.SelectAllUser()
+	users, err := u.SelectAll()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
@@ -62,7 +62,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	reqBody.UserID = userID
 	reqBody.AuthToken = authToken
 
-	if err := reqBody.InsertUser(); err != nil {
+	if err := reqBody.Insert(); err != nil {
 		log.Println(err)
 		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
 	}
@@ -77,7 +77,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func ChangeUser(w http.ResponseWriter, r *http.Request) {
+func ChangeName(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-token")
 
 	body := r.Body
@@ -93,7 +93,7 @@ func ChangeUser(w http.ResponseWriter, r *http.Request) {
 		errorResponse(err, w)
 	}
 
-	if err := reqBody.UpdateUser(token); err != nil {
+	if err := reqBody.Update(token); err != nil {
 		errorResponse(err, w)
 	}
 }
