@@ -6,7 +6,7 @@ import (
 
 //インターフェースを定義
 type userInterface interface {
-	SelectUser(string) (*UserData, error)
+	SelectUser(string) error
 	InsertUser() error
 	UpdateUser(UserData) (UserData, error)
 }
@@ -17,12 +17,12 @@ func New() userInterface {
 }
 
 //インスタンスが持つ関数（メソッド）を定義
-func (u *UserData) SelectUser(token string) (*UserData, error) {
+func (u *UserData) SelectUser(token string) error {
 	row := db.DBInstance.QueryRow("SELECT * FROM user WHERE auth_token = ?", token)
 	if err := row.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {
-		return nil, err
+		return err
 	}
-	return u, nil
+	return nil
 }
 
 func (u *UserData) InsertUser() error {

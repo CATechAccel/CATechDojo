@@ -16,8 +16,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	u := user.New()
 
-	userinfo, err := u.SelectUser(token)
-	if err != nil {
+	if err := u.SelectUser(token); err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
@@ -25,7 +24,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 
-	data, err := json.Marshal(userinfo)
+	data, err := json.Marshal(u)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
