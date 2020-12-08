@@ -104,10 +104,10 @@ func errorResponse(err error, w http.ResponseWriter) {
 }
 
 func createUUID() (string, error) {
-	uuid, err := uuid.NewRandom()
+	uuID, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
 	}
 
-	return uuid.String(), nil
+	return uuID.String(), nil
 }
