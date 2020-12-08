@@ -93,7 +93,7 @@ func ChangeName(w http.ResponseWriter, r *http.Request) {
 		errorResponse(err, w)
 	}
 
-	if err := reqBody.Update(token); err != nil {
+	if err := reqBody.UpdateName(token); err != nil {
 		errorResponse(err, w)
 	}
 }
