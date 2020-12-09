@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetAllUser(w http.ResponseWriter, r *http.Request) {
+func GetAll(w http.ResponseWriter, r *http.Request) {
 	u := user.New()
 
 	users, err := u.SelectAll()
@@ -32,7 +32,7 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func Create(w http.ResponseWriter, r *http.Request) {
 	body := r.Body
 	defer body.Close()
 
