@@ -31,6 +31,11 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-token")
+	if token == "" {
+		log.Println("トークンの値がnilです")
+		http.Error(w, "該当するユーザが存在しませんでした", http.StatusInternalServerError)
+		return
+	}
 
 	u := user.New()
 
