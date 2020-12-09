@@ -7,7 +7,6 @@ import (
 //インターフェースを定義
 type userInterface interface {
 	SelectAll() ([]UserData, error)
-	UpdateName(string) error
 	Insert() error
 }
 
@@ -36,13 +35,6 @@ func (u *UserData) SelectAll() ([]UserData, error) {
 
 func (u *UserData) Insert() error {
 	if _, err := db.DBInstance.Exec("INSERT INTO user(user_id, auth_token, name) VALUES (?, ?, ?)", u.UserID, u.AuthToken, u.Name); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (u *UserData) UpdateName(token string) error {
-	if _, err := db.DBInstance.Exec("UPDATE user SET name = ? WHERE auth_token = ?", u.Name, token); err != nil {
 		return err
 	}
 	return nil
