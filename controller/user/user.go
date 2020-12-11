@@ -33,7 +33,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-token")
 	if token == "" {
 		log.Println("トークンの値がnilです")
-		http.Error(w, "認証情報が必要です。", http.StatusInternalServerError)
+		http.Error(w, "認証情報が必要です。", http.StatusBadRequest)
 		return
 	}
 
