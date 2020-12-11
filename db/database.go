@@ -19,7 +19,7 @@ var DBInstance *sql.DB
 
 func init() {
 	if err := godotenv.Load(); err != nil {
-		log.Printf("failed to load .env file: %v", err)
+		log.Fatalf("failed to load .env file: %v", err)
 	}
 
 	dbuser := os.Getenv("DB_USER")

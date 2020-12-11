@@ -1,6 +1,7 @@
 package user
 
 import (
+	"CATechDojo/controller/request"
 	"CATechDojo/model/user"
 	"bytes"
 	"encoding/json"
@@ -11,10 +12,10 @@ import (
 	"github.com/google/uuid"
 )
 
-func GetAllUser(w http.ResponseWriter, r *http.Request) {
+func GetAll(w http.ResponseWriter, r *http.Request) {
 	u := user.New()
 
-	users, err := u.SelectAllUser()
+	users, err := u.SelectAll()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
@@ -31,7 +32,7 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func Create(w http.ResponseWriter, r *http.Request) {
 	body := r.Body
 	defer body.Close()
 
@@ -62,7 +63,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	reqBody.UserID = userID
 	reqBody.AuthToken = authToken
 
-	if err := reqBody.InsertUser(); err != nil {
+	if err := reqBody.Insert(); err != nil {
 		log.Println(err)
 		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
 	}
@@ -77,11 +78,39 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
+func ChangeName(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("x-token")
+
+	body := r.Body
+	defer body.Close()
+
+	buf := new(bytes.Buffer)
+	if _, err := io.Copy(buf, body); err != nil {
+		errorResponse(err, w)
+	}
+
+	var reqBody request.UpdateNameRequest
+	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
+		errorResponse(err, w)
+	}
+
+	var u user.UserData
+	u.Name = reqBody.Name
+	if err := u.UpdateName(token); err != nil {
+		errorResponse(err, w)
+	}
+}
+
+func errorResponse(err error, w http.ResponseWriter) {
+	log.Println(err)
+	http.Error(w, err.Error(), http.StatusInternalServerError)
+}
+
 func createUUID() (string, error) {
-	uuid, err := uuid.NewRandom()
+	uuID, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
 	}
 
-	return uuid.String(), nil
+	return uuID.String(), nil
 }
