@@ -8,7 +8,7 @@ import (
 type userInterface interface {
 	SelectAll() ([]UserData, error)
 	Insert() error
-	UpdateName(string) error
+	UpdateName(token string) error
 }
 
 //定義したインターフェースを満たすインスタンスを生成する関数を定義
