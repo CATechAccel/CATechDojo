@@ -95,7 +95,8 @@ func ChangeName(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var u user.UserData
-	if err := u.UpdateName(reqBody.Name, token); err != nil {
+	u.Name = reqBody.Name
+	if err := u.UpdateName(token); err != nil {
 		errorResponse(err, w)
 	}
 }
