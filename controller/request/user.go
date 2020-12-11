@@ -1,5 +1,5 @@
 package request
 
-type UpdateRequest struct {
+type UpdateNameRequest struct {
 	Name string `json:"name"`
 }

@@ -1,7 +1,7 @@
 package user
 
 import (
-	"CATechDojo/model/request"
+	"CATechDojo/controller/request"
 	"CATechDojo/model/user"
 	"bytes"
 	"encoding/json"
@@ -89,7 +89,7 @@ func ChangeName(w http.ResponseWriter, r *http.Request) {
 		errorResponse(err, w)
 	}
 
-	var reqBody request.UpdateRequest
+	var reqBody request.UpdateNameRequest
 	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
 		errorResponse(err, w)
 	}
