@@ -2,6 +2,7 @@ package user
 
 import (
 	"CATechDojo/controller/request"
+	"CATechDojo/controller/response"
 	"CATechDojo/model/user"
 	"bytes"
 	"encoding/json"
@@ -23,7 +24,16 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 
-	data, err := json.Marshal(users)
+	var userSlice response.GetAllUserRespponse
+	for _, userdata := range users {
+		res := response.UserResponse{
+			UserID: userdata.UserID,
+			Name:   userdata.Name,
+		}
+		userSlice.Users = append(userSlice.Users, res)
+	}
+
+	data, err := json.Marshal(userSlice)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -48,7 +58,11 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 
-	data, err := json.Marshal(u)
+	res := response.GetUserResponse{
+		Name: u.GetName(),
+	}
+
+	data, err := json.Marshal(res)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -92,9 +106,12 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
 	}
 
+	var res response.CreateUserResponse
+	res.Token = reqBody.AuthToken
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	data, err := json.Marshal(reqBody)
+	data, err := json.Marshal(res)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
