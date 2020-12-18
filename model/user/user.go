@@ -7,9 +7,10 @@ import (
 //インターフェースを定義
 type userInterface interface {
 	SelectAll() ([]UserData, error)
-  SelectUser(string) error
+	SelectUser(string) error
 	Insert() error
 	UpdateName(token string) error
+	GetName() string
 }
 
 //定義したインターフェースを満たすインスタンスを生成する関数を定義
@@ -18,6 +19,10 @@ func New() userInterface {
 }
 
 //インスタンスが持つ関数（メソッド）を定義
+func (u *UserData) GetName() string {
+	return u.Name
+}
+
 func (u *UserData) SelectAll() ([]UserData, error) {
 	rows, err := db.DBInstance.Query("SELECT * FROM user")
 	if err != nil {
@@ -34,7 +39,6 @@ func (u *UserData) SelectAll() ([]UserData, error) {
 	}
 	return userSlice, nil
 }
-
 
 func (u *UserData) SelectUser(token string) error {
 	row := db.DBInstance.QueryRow("SELECT * FROM user WHERE auth_token = ?", token)
