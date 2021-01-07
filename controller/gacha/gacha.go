@@ -1,6 +1,7 @@
 package gacha
 
 import (
+	"CATechDojo/model/gacha"
 	"bytes"
 	"encoding/json"
 	"io"
@@ -34,5 +35,18 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//特定のキャラクターをDBから取り出す
+	c := gacha.New()
+
+	if err := c.Select(); err != nil {
+		log.Println(err)
+		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
+	}
+
+	//取り出したキャラクターをDBに保存する
+	if err := c.Insert(); err != nil {
+		log.Println(err)
+		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
+	}
+
 	//取り出したキャラクターのidとnameをjson形式で返す
 }
