@@ -1,6 +1,7 @@
 package gacha
 
 import (
+	"CATechDojo/controller/user"
 	"CATechDojo/model/gacha"
 	"bytes"
 	"encoding/json"
@@ -28,7 +29,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	var times int
+	var times struct{}
 	if err := json.Unmarshal(buf.Bytes(), &times); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -43,10 +44,24 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//取り出したキャラクターをDBに保存する
-	if err := c.Insert(); err != nil {
+	userCharacterID, err := user.CreateUUID()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	if err := c.Insert(userCharacterID, token); err != nil {
 		log.Println(err)
 		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
 	}
 
 	//取り出したキャラクターのidとnameをjson形式で返す
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+	data, err := json.Marshal(c)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	_, _ = w.Write(data)
 }
