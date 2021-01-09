@@ -36,3 +36,10 @@ CREATE TABLE `ca_tech_dojo`.`user_characters`
             ON DELETE CASCADE
             ON UPDATE CASCADE
 );
+
+#ガチャオッズテーブル
+CREATE TABLE `ca_tech_dojo`.`gacha_odds` (
+     `character_id` VARCHAR(128) NOT NULL,
+     `odds` INT NOT NULL,
+     PRIMARY KEY (`character_id`)
+);
