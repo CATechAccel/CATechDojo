@@ -86,13 +86,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	userID, err := createUUID()
+	userID, err := CreateUUID()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	authToken, err := createUUID()
+	authToken, err := CreateUUID()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -147,7 +147,7 @@ func errorResponse(err error, w http.ResponseWriter) {
 	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
 
-func createUUID() (string, error) {
+func CreateUUID() (string, error) {
 	uuID, err := uuid.NewRandom()
 	if err != nil {
 		return "", err
