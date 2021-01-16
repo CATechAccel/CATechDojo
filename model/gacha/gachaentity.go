@@ -1,6 +1,7 @@
 package gacha
 
-type CharacterData struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+type GachaData struct {
+	CharacterID string `json:"character_id"`
+	Name        string `json:"name"`
+	Odds        int    `json:"odds"`
 }
