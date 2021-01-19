@@ -3,8 +3,8 @@ package gacha
 import (
 	"CATechDojo/controller/request"
 	"CATechDojo/controller/response"
-	"CATechDojo/controller/user"
 	"CATechDojo/model/gacha"
+	"CATechDojo/service/util"
 	"bytes"
 	"encoding/json"
 	"io"
@@ -32,7 +32,7 @@ func DrawSpecificCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//取り出したキャラクターをDBに保存する
-	userCharacterID, err := user.CreateUUID()
+	userCharacterID, err := util.CreateUUID()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -117,7 +117,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 
 		hitCharactersData = append(hitCharactersData, *hitCharacterData)
 
-		userCharacterID, err := user.CreateUUID()
+		userCharacterID, err := util.CreateUUID()
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -4,13 +4,12 @@ import (
 	"CATechDojo/controller/request"
 	"CATechDojo/controller/response"
 	"CATechDojo/model/user"
+	"CATechDojo/service/util"
 	"bytes"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
-
-	"github.com/google/uuid"
 )
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
@@ -86,13 +85,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	userID, err := CreateUUID()
+	userID, err := util.CreateUUID()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	authToken, err := CreateUUID()
+	authToken, err := util.CreateUUID()
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -145,13 +144,4 @@ func ChangeName(w http.ResponseWriter, r *http.Request) {
 func errorResponse(err error, w http.ResponseWriter) {
 	log.Println(err)
 	http.Error(w, err.Error(), http.StatusInternalServerError)
-}
-
-func CreateUUID() (string, error) {
-	uuID, err := uuid.NewRandom()
-	if err != nil {
-		return "", err
-	}
-
-	return uuID.String(), nil
 }
