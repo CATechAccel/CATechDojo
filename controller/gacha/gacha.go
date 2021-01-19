@@ -1,6 +1,8 @@
 package gacha
 
 import (
+	"CATechDojo/controller/request"
+	"CATechDojo/controller/response"
 	"CATechDojo/controller/user"
 	"CATechDojo/model/gacha"
 	"bytes"
@@ -22,9 +24,9 @@ func DrawSpecificCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//特定のキャラクターをDBから取り出す
-	c := gacha.New()
+	g := gacha.New()
 
-	if err := c.SelectCharacter(); err != nil {
+	if err := g.SelectCharacter(); err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
@@ -36,15 +38,17 @@ func DrawSpecificCharacter(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	if err := c.InsertCharacter(userCharacterID, token); err != nil {
+	if err := g.InsertCharacter(userCharacterID, token); err != nil {
 		log.Println(err)
 		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
 	}
 
 	//取り出したキャラクターのidとnameをjson形式で返す
+	res := g.GetCharacterData()
+
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	data, err := json.Marshal(c)
+	data, err := json.Marshal(res)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -69,7 +73,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	var times struct{}
+	var times request.Times
 	if err := json.Unmarshal(buf.Bytes(), &times); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -83,45 +87,60 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
 
-	//乱数を作成
+	var hitCharacterID string
+	hitCharactersData := make([]gacha.GachaData, 0)
+
 	rand.Seed(time.Now().UnixNano())
-	randam := rand.Intn(oddsSum(odds))
 
-	//カウントアップ用変数を定義
-	var count int
-	var hitCharacterID *string
+	for i := 1; i <= times.Times; i++ {
+		//乱数を作成
+		random := rand.Intn(oddsSum(odds))
 
-	//当選キャラクターの決定
-	for i, _ := range odds {
-		count += odds[i].Odds
+		var count int
+		//当選キャラクターの決定
+		for i, _ := range odds {
+			count += odds[i].Odds
 
-		if count < randam {
-			continue
+			if count < random {
+				continue
+			}
+			h := odds[i].CharacterID
+			hitCharacterID = h
+			break
 		}
-		h := odds[i].CharacterID
-		hitCharacterID = &h
-		break
+
+		hitCharacterData, err := g.SelectHitCharacter(hitCharacterID)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
+		}
+
+		hitCharactersData = append(hitCharactersData, *hitCharacterData)
+
+		userCharacterID, err := user.CreateUUID()
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		if err := g.InsertHitCharacter(token, userCharacterID, hitCharacterID); err != nil {
+			log.Println(err)
+			http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
+		}
 	}
 
-	if err := g.SelectHitCharacter(*hitCharacterID); err != nil {
-		log.Println()
-		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
-	}
-
-	userCharacterID, err := user.CreateUUID()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	if err := g.InsertHitCharacter(token, userCharacterID, *hitCharacterID); err != nil {
-		log.Println(err)
-		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
+	var hitCharacterslice response.DrawAllResponse
+	for _, hitCharacterData := range hitCharactersData {
+		res := response.DrawResponse{
+			CharacterID: hitCharacterData.CharacterID,
+			Name:        hitCharacterData.Name,
+		}
+		hitCharacterslice.Results = append(hitCharacterslice.Results, res)
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	data, err := json.Marshal(g)
+	data, err := json.Marshal(hitCharacterslice)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
