@@ -1,14 +1,10 @@
 package gacha
 
 import (
-	"CATechDojo/controller/response"
 	"CATechDojo/db"
 )
 
 type gachaInterface interface {
-	GetCharacterData() response.DrawResponse
-	SelectCharacter() error
-	InsertCharacter(userChracterID string, token string) error
 	SelectAllOdds() ([]GachaData, error)
 	SelectHitCharacter(HitCharacterID string) (*GachaData, error)
 	InsertHitCharacter(token string, userCharacterID string, HitCharacterID string) error
@@ -16,33 +12,6 @@ type gachaInterface interface {
 
 func New() gachaInterface {
 	return &GachaData{}
-}
-
-func (g *GachaData) GetCharacterData() response.DrawResponse {
-	return response.DrawResponse{
-		g.CharacterID,
-		g.Name,
-	}
-}
-
-func (g *GachaData) SelectCharacter() error {
-	row := db.DBInstance.QueryRow("SELECT id, name FROM characters WHERE id = ?", "character_0001")
-	if err := row.Scan(&g.CharacterID, &g.Name); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (g *GachaData) InsertCharacter(userCharacterID string, token string) error {
-	var userID string
-	row := db.DBInstance.QueryRow("SELECT user_id FROM users WHERE auth_token = ?", token)
-	if err := row.Scan(&userID); err != nil {
-		return err
-	}
-	if _, err := db.DBInstance.Exec("INSERT INTO user_characters(user_character_id, user_id, character_id) VALUES (?, ?, ?)", userCharacterID, userID, g.CharacterID); err != nil {
-		return err
-	}
-	return nil
 }
 
 func (g *GachaData) SelectAllOdds() ([]GachaData, error) {

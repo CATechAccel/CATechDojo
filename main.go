@@ -19,7 +19,6 @@ func main() {
 	r.HandleFunc("/user/get", user.GetUser).Methods("GET")
 	r.HandleFunc("/user/create", user.Create).Methods("POST")
 	r.HandleFunc("/user/update", user.ChangeName).Methods("PUT")
-	r.HandleFunc("/gacha/drawspecific", gacha.DrawSpecificCharacter).Methods("GET")
 	r.HandleFunc("/gacha/draw", gacha.Draw).Methods("GET")
 
 	http.ListenAndServe(":8080", r)

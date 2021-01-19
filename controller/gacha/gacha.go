@@ -14,48 +14,6 @@ import (
 	"time"
 )
 
-func DrawSpecificCharacter(w http.ResponseWriter, r *http.Request) {
-	//x-tokenを受け取る
-	token := r.Header.Get("x-token")
-	if token == "" {
-		log.Println("トークンの値がnilです")
-		http.Error(w, "認証情報が必要です。", http.StatusBadRequest)
-		return
-	}
-
-	//特定のキャラクターをDBから取り出す
-	g := gacha.New()
-
-	if err := g.SelectCharacter(); err != nil {
-		log.Println(err)
-		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
-	}
-
-	//取り出したキャラクターをDBに保存する
-	userCharacterID, err := util.CreateUUID()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	if err := g.InsertCharacter(userCharacterID, token); err != nil {
-		log.Println(err)
-		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
-	}
-
-	//取り出したキャラクターのidとnameをjson形式で返す
-	res := g.GetCharacterData()
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	data, err := json.Marshal(res)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-	_, _ = w.Write(data)
-}
-
 func Draw(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-token")
 	if token == "" {
@@ -125,7 +83,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 
 		if err := g.InsertHitCharacter(token, userCharacterID, hitCharacterID); err != nil {
 			log.Println(err)
-			http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
+			http.Error(w, "ユーザーデータを保存できませんでした", http.StatusInternalServerError)
 		}
 	}
 
