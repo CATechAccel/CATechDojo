@@ -46,7 +46,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var hitCharacterID string
-	hitCharactersData := make([]gacha.GachaData, 0)
+	hitCharactersData := make([]gacha.CharacterData, 0)
 
 	rand.Seed(time.Now().UnixNano())
 
@@ -81,7 +81,13 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 
-		if err := g.InsertHitCharacter(token, userCharacterID, hitCharacterID); err != nil {
+		userID, err := g.SelectUserID(token)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
+		}
+
+		if err := g.InsertHitCharacter(userCharacterID, userID, hitCharacterID); err != nil {
 			log.Println(err)
 			http.Error(w, "ユーザーデータを保存できませんでした", http.StatusInternalServerError)
 		}
@@ -106,10 +112,10 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func oddsSum(odds []gacha.GachaData) int {
+func oddsSum(odds []gacha.CharacterData) int {
 	var sum int
-	for _, gachadata := range odds {
-		sum += gachadata.Odds
+	for _, o := range odds {
+		sum += o.Odds
 	}
 	return sum
 }
