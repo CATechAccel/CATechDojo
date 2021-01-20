@@ -18,7 +18,7 @@ func Show(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var userCharacterSlice []characters.UserCharacterData
-	for _, u := range getUserCharacterID(token) {
+	for _, u := range getUserCharactersData(token) {
 		userCharacterData := characters.UserCharacterData{
 			UserCharacterID: u.UserCharacterID,
 			CharacterID:     u.CharacterID,
@@ -47,7 +47,7 @@ func getUserID(token string) string {
 	return userID
 }
 
-func getUserCharacterID(token string) []characters.UserCharacterData {
+func getUserCharactersData(token string) []characters.UserCharacterData {
 	userCharacters, err := characters.SelectUserCharacters(getUserID(token))
 	if err != nil {
 		fmt.Println("データを参照できませんでした")
