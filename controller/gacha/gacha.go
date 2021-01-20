@@ -92,7 +92,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var hitCharacterslice response.DrawAllResponse
+	var hitCharacterSlice response.DrawAllResponse
 	for _, hitCharacterData := range hitCharactersData {
 		res := response.DrawResponse{
 			CharacterID: hitCharacterData.CharacterID,
