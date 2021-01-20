@@ -47,22 +47,22 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	var hitCharacterID string
 	hitCharactersData := make([]gacha.CharacterData, 0)
 
-	//乱数を作成するための初期化
 	rand.Seed(time.Now().UnixNano())
 
-	for i := 1; i <= times.Times; i++ {
+	for i := 0; i < times.Times; i++ {
 		//乱数を作成
 		random := rand.Intn(oddsSum(odds))
 
-		var count int
 		//当選キャラクターの決定
+		var count int
 		for i, _ := range odds {
 			count += odds[i].Odds
 
 			if count < random {
 				continue
 			}
-			hitCharacterID = odds[i].CharacterID
+			h := odds[i].CharacterID
+			hitCharacterID = h
 			break
 		}
 
@@ -92,9 +92,9 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var hitCharacterslice response.DrawResponse
+	var hitCharacterSlice response.DrawAllResponse
 	for _, hitCharacterData := range hitCharactersData {
-		res := response.DrawResult{
+		res := response.DrawResponse{
 			CharacterID: hitCharacterData.CharacterID,
 			Name:        hitCharacterData.Name,
 		}
