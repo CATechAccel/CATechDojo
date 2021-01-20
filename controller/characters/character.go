@@ -4,6 +4,7 @@ import (
 	"CATechDojo/controller/response"
 	"CATechDojo/model/characters"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -16,34 +17,14 @@ func Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := characters.New()
-
-	//user_idの取得
-	userID, err := c.SelectUserID(token)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
-	}
-
-	//user_idを用いてuser_character_id, character_idを取得
-	userCharacters, err := c.SelectUserCharacters(userID)
-	if err != nil {
-		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
-	}
-
 	var userCharacterSlice []characters.UserCharacterData
-	for _, u := range userCharacters {
-		characterName, err := c.SelectCharacterName(u.CharacterID)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
-		}
-		res := characters.UserCharacterData{
+	for _, u := range getUserCharacterID(token) {
+		userCharacterData := characters.UserCharacterData{
 			UserCharacterID: u.UserCharacterID,
 			CharacterID:     u.CharacterID,
-			Name:            characterName,
+			Name:            getCharacterName(u.CharacterID),
 		}
-		userCharacterSlice = append(userCharacterSlice, res)
+		userCharacterSlice = append(userCharacterSlice, userCharacterData)
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
@@ -56,5 +37,28 @@ func Show(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	_, _ = w.Write(data)
+}
 
+func getUserID(token string) string {
+	userID, err := characters.SelectUserID(token)
+	if err != nil {
+		fmt.Println("データを参照できませんでした")
+	}
+	return userID
+}
+
+func getUserCharacterID(token string) []characters.UserCharacterData {
+	userCharacters, err := characters.SelectUserCharacters(getUserID(token))
+	if err != nil {
+		fmt.Println("データを参照できませんでした")
+	}
+	return userCharacters
+}
+
+func getCharacterName(characterID string) string {
+	characterName, err := characters.SelectCharacterName(characterID)
+	if err != nil {
+		fmt.Println("データを参照できませんでした")
+	}
+	return characterName
 }
