@@ -24,7 +24,7 @@ func (u *UserData) GetName() string {
 }
 
 func (u *UserData) SelectAll() ([]UserData, error) {
-	rows, err := db.DBInstance.Query("SELECT * FROM user")
+	rows, err := db.DBInstance.Query("SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (u *UserData) SelectAll() ([]UserData, error) {
 }
 
 func (u *UserData) SelectUser(token string) error {
-	row := db.DBInstance.QueryRow("SELECT * FROM user WHERE auth_token = ?", token)
+	row := db.DBInstance.QueryRow("SELECT * FROM users WHERE auth_token = ?", token)
 	if err := row.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {
 		return err
 	}
@@ -49,14 +49,14 @@ func (u *UserData) SelectUser(token string) error {
 }
 
 func (u *UserData) Insert() error {
-	if _, err := db.DBInstance.Exec("INSERT INTO user(user_id, auth_token, name) VALUES (?, ?, ?)", u.UserID, u.AuthToken, u.Name); err != nil {
+	if _, err := db.DBInstance.Exec("INSERT INTO users(user_id, auth_token, name) VALUES (?, ?, ?)", u.UserID, u.AuthToken, u.Name); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (u *UserData) UpdateName(token string) error {
-	if _, err := db.DBInstance.Exec("UPDATE user SET name = ? WHERE auth_token = ?", u.Name, token); err != nil {
+	if _, err := db.DBInstance.Exec("UPDATE users SET name = ? WHERE auth_token = ?", u.Name, token); err != nil {
 		return err
 	}
 	return nil
