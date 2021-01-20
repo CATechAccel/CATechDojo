@@ -92,18 +92,18 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var hitCharacterSlice response.DrawAllResponse
+	var hitCharacterSlice response.DrawResponse
 	for _, hitCharacterData := range hitCharactersData {
-		res := response.DrawResponse{
+		res := response.DrawResult{
 			CharacterID: hitCharacterData.CharacterID,
 			Name:        hitCharacterData.Name,
 		}
-		hitCharacterslice.Results = append(hitCharacterslice.Results, res)
+		hitCharacterSlice.Results = append(hitCharacterSlice.Results, res)
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
-	data, err := json.Marshal(hitCharacterslice)
+	data, err := json.Marshal(hitCharacterSlice)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
