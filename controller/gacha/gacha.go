@@ -39,7 +39,6 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 
 	//gacha_oddsテーブルから全件取得
 	g := gacha.New()
-
 	odds, err := g.SelectAllOdds()
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
