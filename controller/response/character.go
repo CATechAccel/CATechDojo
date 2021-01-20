@@ -1,7 +1,7 @@
 package response
 
-import "CATechDojo/model/characters"
+import "CATechDojo/model/character"
 
 type CharactersResponse struct {
-	Characters []characters.UserCharacterData `json:"characters"`
+	Characters []character.UserCharacterData `json:"character"`
 }

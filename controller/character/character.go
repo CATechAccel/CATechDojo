@@ -1,8 +1,8 @@
-package characters
+package character
 
 import (
 	"CATechDojo/controller/response"
-	"CATechDojo/model/characters"
+	"CATechDojo/model/character"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -17,9 +17,9 @@ func Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var userCharacterSlice []characters.UserCharacterData
+	var userCharacterSlice []character.UserCharacterData
 	for _, u := range getUserCharactersData(token) {
-		userCharacterData := characters.UserCharacterData{
+		userCharacterData := character.UserCharacterData{
 			UserCharacterID: u.UserCharacterID,
 			CharacterID:     u.CharacterID,
 			Name:            getCharacterName(u.CharacterID),
@@ -40,15 +40,15 @@ func Show(w http.ResponseWriter, r *http.Request) {
 }
 
 func getUserID(token string) string {
-	userID, err := characters.SelectUserID(token)
+	userID, err := character.SelectUserID(token)
 	if err != nil {
 		fmt.Println("データを参照できませんでした")
 	}
 	return userID
 }
 
-func getUserCharactersData(token string) []characters.UserCharacterData {
-	userCharacters, err := characters.SelectUserCharacters(getUserID(token))
+func getUserCharactersData(token string) []character.UserCharacterData {
+	userCharacters, err := character.SelectUserCharacters(getUserID(token))
 	if err != nil {
 		fmt.Println("データを参照できませんでした")
 	}
@@ -56,7 +56,7 @@ func getUserCharactersData(token string) []characters.UserCharacterData {
 }
 
 func getCharacterName(characterID string) string {
-	characterName, err := characters.SelectCharacterName(characterID)
+	characterName, err := character.SelectCharacterName(characterID)
 	if err != nil {
 		fmt.Println("データを参照できませんでした")
 	}

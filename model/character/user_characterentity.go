@@ -1,4 +1,4 @@
-package characters
+package character
 
 type UserCharacterData struct {
 	UserCharacterID string `json:"user_character_id"`
