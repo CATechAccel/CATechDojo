@@ -47,6 +47,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	var hitCharacterID string
 	hitCharactersData := make([]gacha.CharacterData, 0)
 
+	//乱数を作成するための初期化
 	rand.Seed(time.Now().UnixNano())
 
 	for i := 0; i < times.Times; i++ {
@@ -61,8 +62,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 			if count < random {
 				continue
 			}
-			h := odds[i].CharacterID
-			hitCharacterID = h
+			hitCharacterID = odds[i].CharacterID
 			break
 		}
 
