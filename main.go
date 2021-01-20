@@ -1,6 +1,7 @@
 package main
 
 import (
+	"CATechDojo/controller/characters"
 	"CATechDojo/controller/health"
 	"CATechDojo/controller/user"
 	"net/http"
@@ -18,6 +19,7 @@ func main() {
 	r.HandleFunc("/user/get", user.GetUser).Methods("GET")
 	r.HandleFunc("/user/create", user.Create).Methods("POST")
 	r.HandleFunc("/user/update", user.ChangeName).Methods("PUT")
+	r.HandleFunc("/characters/list", characters.Show).Methods("GET")
 
 	http.ListenAndServe(":8080", r)
 }
