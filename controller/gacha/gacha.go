@@ -53,8 +53,8 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		//乱数を作成
 		random := rand.Intn(oddsSum(odds))
 
-		var count int
 		//当選キャラクターの決定
+		var count int
 		for i, _ := range odds {
 			count += odds[i].Odds
 
