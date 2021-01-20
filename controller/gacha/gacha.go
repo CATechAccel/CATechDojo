@@ -49,7 +49,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 
 	rand.Seed(time.Now().UnixNano())
 
-	for i := 1; i <= times.Times; i++ {
+	for i := 0; i < times.Times; i++ {
 		//乱数を作成
 		random := rand.Intn(oddsSum(odds))
 
