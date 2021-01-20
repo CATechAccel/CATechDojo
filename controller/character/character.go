@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func Show(w http.ResponseWriter, r *http.Request) {
+func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-token")
 	if token == "" {
 		log.Println("トークンの値がnilです")
