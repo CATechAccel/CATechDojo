@@ -7,7 +7,7 @@ import (
 //インターフェースを定義
 type userInterface interface {
 	SelectAll() ([]UserData, error)
-	SelectUser(string) error
+	SelectUser(token string) error
 	Insert() error
 	UpdateName(token string) error
 	GetName() string

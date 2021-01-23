@@ -1,40 +1,28 @@
 package character
 
-import "CATechDojo/db"
+import (
+	"CATechDojo/db"
+)
 
 type characterInterface interface {
-	SelectUserCharacters(UserID string) ([]UserCharacterData, error)
-	SelectCharacterName(CharacterID string) (string, error)
+	SelectCharacterByCharacterID(CharacterID string) error
+	GetName() string
 }
 
 func New() characterInterface {
 	return &CharacterData{}
 }
 
-func (c *CharacterData) SelectUserCharacters(UserID string) ([]UserCharacterData, error) {
-	rows, err := db.DBInstance.Query("SELECT user_character_id, character_id FROM user_characters WHERE user_id =?", UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	userCharacterSlice := make([]UserCharacterData, 0)
-	for rows.Next() {
-		var u UserCharacterData
-		if err := rows.Scan(&u.UserCharacterID, &u.CharacterID); err != nil {
-			return nil, err
-		}
-		userCharacterSlice = append(userCharacterSlice, u)
-	}
-	return userCharacterSlice, nil
+func (c *CharacterData) GetName() string {
+	return c.Name
 }
 
-func (c *CharacterData) SelectCharacterName(CharacterID string) (string, error) {
-	var name string
-	row := db.DBInstance.QueryRow("SELECT name FROM characters WHERE id = ?", CharacterID)
-	if err := row.Scan(&name); err != nil {
-		return "", err
+func (c *CharacterData) SelectCharacterByCharacterID(CharacterID string) error {
+	row := db.DBInstance.QueryRow("SELECT id, name, power FROM characters WHERE id = ?", CharacterID)
+	if err := row.Scan(&c.ID, &c.Name, &c.Power); err != nil {
+		return  err
 	}
-	return name, nil
+	return nil
 }
 
 /*
