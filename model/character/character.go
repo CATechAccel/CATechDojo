@@ -2,26 +2,16 @@ package character
 
 import "CATechDojo/db"
 
-type userCharacterInterface interface {
-	SelectUserID(token string) (string, error)
+type characterInterface interface {
 	SelectUserCharacters(UserID string) ([]UserCharacterData, error)
 	SelectCharacterName(CharacterID string) (string, error)
 }
 
-func New() userCharacterInterface {
-	return &UserCharacterData{}
+func New() characterInterface {
+	return &CharacterData{}
 }
 
-func (c *UserCharacterData) SelectUserID(token string) (string, error) {
-	var userID string
-	row := db.DBInstance.QueryRow("SELECT user_id FROM users WHERE auth_token = ?", token)
-	if err := row.Scan(&userID); err != nil {
-		return "", err
-	}
-	return userID, nil
-}
-
-func (c *UserCharacterData) SelectUserCharacters(UserID string) ([]UserCharacterData, error) {
+func (c *CharacterData) SelectUserCharacters(UserID string) ([]UserCharacterData, error) {
 	rows, err := db.DBInstance.Query("SELECT user_character_id, character_id FROM user_characters WHERE user_id =?", UserID)
 	if err != nil {
 		return nil, err
@@ -38,12 +28,13 @@ func (c *UserCharacterData) SelectUserCharacters(UserID string) ([]UserCharacter
 	return userCharacterSlice, nil
 }
 
-func (c *UserCharacterData) SelectCharacterName(CharacterID string) (string, error) {
+func (c *CharacterData) SelectCharacterName(CharacterID string) (string, error) {
+	var name string
 	row := db.DBInstance.QueryRow("SELECT name FROM characters WHERE id = ?", CharacterID)
-	if err := row.Scan(&c.Name); err != nil {
+	if err := row.Scan(&name); err != nil {
 		return "", err
 	}
-	return c.Name, nil
+	return name, nil
 }
 
 /*

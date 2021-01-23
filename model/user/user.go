@@ -11,16 +11,19 @@ type userInterface interface {
 	Insert() error
 	UpdateName(token string) error
 	GetName() string
+	GetUserID() string
 }
 
-//定義したインターフェースを満たすインスタンスを生成する関数を定義
 func New() userInterface {
 	return &UserData{}
 }
 
-//インスタンスが持つ関数（メソッド）を定義
 func (u *UserData) GetName() string {
 	return u.Name
+}
+
+func (u *UserData) GetUserID() string {
+	return u.UserID
 }
 
 func (u *UserData) SelectAll() ([]UserData, error) {

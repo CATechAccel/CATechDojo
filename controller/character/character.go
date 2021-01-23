@@ -3,6 +3,7 @@ package character
 import (
 	"CATechDojo/controller/response"
 	"CATechDojo/model/character"
+	"CATechDojo/model/user"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -16,40 +17,38 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := character.New()
-
-	//user_idの取得
-	userID, err := c.SelectUserID(token)
-	if err != nil {
+	u := user.New()
+	if err := u.SelectUser(token); err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
 
-	//user_idを用いてuser_character_id, character_idを取得
-	userCharacters, err := c.SelectUserCharacters(userID)
+	// user_idを用いてuser_character_id, character_idを取得
+	c := character.New()
+	userCharacters, err := c.SelectUserCharacters(u.GetUserID())
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
 
-	var userCharacterSlice []character.UserCharacterData
-	for _, u := range userCharacters {
-		characterName, err := c.SelectCharacterName(u.CharacterID)
+	var userCharacterResponseSlice []response.UserCharacterResponse
+	for _, userCharacter := range userCharacters {
+		characterName, err := c.SelectCharacterName(userCharacter.CharacterID)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 		}
-		res := character.UserCharacterData{
-			UserCharacterID: u.UserCharacterID,
-			CharacterID:     u.CharacterID,
+		res := response.UserCharacterResponse{
+			UserCharacterID: userCharacter.UserCharacterID,
+			CharacterID:     userCharacter.CharacterID,
 			Name:            characterName,
 		}
-		userCharacterSlice = append(userCharacterSlice, res)
+		userCharacterResponseSlice = append(userCharacterResponseSlice, res)
 	}
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 
-	res := response.CharactersResponse{userCharacterSlice}
+	res := response.CharactersResponse{userCharacterResponseSlice}
 	data, err := json.Marshal(res)
 	if err != nil {
 		log.Println(err)
