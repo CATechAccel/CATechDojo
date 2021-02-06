@@ -7,7 +7,7 @@ import (
 //インターフェースを定義
 type userInterface interface {
 	SelectAll() ([]UserData, error)
-	SelectUser(token string) error
+	SelectUser(token string) (*UserData, error)
 	Insert() error
 	UpdateName(token string) error
 	GetName() string
@@ -43,12 +43,12 @@ func (u *UserData) SelectAll() ([]UserData, error) {
 	return userSlice, nil
 }
 
-func (u *UserData) SelectUser(token string) error {
+func (u *UserData) SelectUser(token string) (*UserData, error) {
 	row := db.DBInstance.QueryRow("SELECT * FROM users WHERE auth_token = ?", token)
 	if err := row.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return u, nil
 }
 
 func (u *UserData) Insert() error {
