@@ -3,7 +3,9 @@ package gacha
 import (
 	"CATechDojo/controller/request"
 	"CATechDojo/controller/response"
+	"CATechDojo/model/character"
 	"CATechDojo/model/gacha"
+	"CATechDojo/model/user"
 	"CATechDojo/service/util"
 	"bytes"
 	"encoding/json"
@@ -37,15 +39,30 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
+	//ユーザーキャラクターIDの作成
+	userCharacterID, err := util.CreateUUID()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	//userIDの取得
+	u := user.New()
+	userData, err := u.SelectUser(token)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
+	}
+
 	//gacha_oddsテーブルから全件取得
 	g := gacha.New()
-	odds, err := g.SelectAllOdds()
+	odds, err := g.SelectAll()
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
 
 	var hitCharacterID string
-	hitCharactersData := make([]gacha.CharacterData, 0)
+	hitCharactersData := make([]character.CharacterData, 0)
 
 	//乱数を作成するための初期化
 	rand.Seed(time.Now().UnixNano())
@@ -66,7 +83,9 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 
-		hitCharacterData, err := g.SelectHitCharacter(hitCharacterID)
+		//該当キャラクターのデータを取得
+		c := character.New()
+		hitCharacterData, err := c.SelectByCharacterID(hitCharacterID)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
@@ -74,19 +93,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 
 		hitCharactersData = append(hitCharactersData, *hitCharacterData)
 
-		userCharacterID, err := util.CreateUUID()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-
-		userID, err := g.SelectUserID(token)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
-		}
-
-		if err := g.InsertHitCharacter(userCharacterID, userID, hitCharacterID); err != nil {
+		if err := c.InsertHitCharacterData(userCharacterID, userData.UserID, hitCharacterID); err != nil {
 			log.Println(err)
 			http.Error(w, "キャラクターデータを保存できませんでした", http.StatusInternalServerError)
 		}
@@ -95,7 +102,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	var hitCharacterSlice response.DrawResponse
 	for _, hitCharacterData := range hitCharactersData {
 		res := response.DrawResult{
-			CharacterID: hitCharacterData.CharacterID,
+			CharacterID: hitCharacterData.ID,
 			Name:        hitCharacterData.Name,
 		}
 		hitCharacterSlice.Results = append(hitCharacterSlice.Results, res)
@@ -111,7 +118,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func oddsSum(odds []gacha.CharacterData) int {
+func oddsSum(odds []gacha.OddsData) int {
 	var sum int
 	for _, o := range odds {
 		sum += o.Odds
