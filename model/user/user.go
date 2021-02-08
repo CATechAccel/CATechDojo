@@ -43,6 +43,7 @@ func (u *UserData) SelectAll() ([]UserData, error) {
 	return userSlice, nil
 }
 
+// TODO: SelectUserByTokenみたいなわかりやすい名前をつける
 func (u *UserData) SelectUser(token string) (*UserData, error) {
 	row := db.DBInstance.QueryRow("SELECT * FROM users WHERE auth_token = ?", token)
 	if err := row.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {

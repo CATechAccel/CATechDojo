@@ -48,7 +48,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := user.New()
-
+	// TODO: 返り値を受け取る実装に修正する（他のところも含めて）
 	if _, err := u.SelectUser(token); err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
