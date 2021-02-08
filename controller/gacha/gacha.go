@@ -62,7 +62,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var hitCharacterID string
-	hitCharactersData := make([]character.CharacterData, 0)
+	hitCharactersData := make([]character.CharacterEntity, 0)
 
 	//乱数を作成するための初期化
 	rand.Seed(time.Now().UnixNano())
@@ -118,7 +118,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write(data)
 }
 
-func oddsSum(odds []gacha.OddsData) int {
+func oddsSum(odds []gacha.OddsEntity) int {
 	var sum int
 	for _, o := range odds {
 		sum += o.Odds

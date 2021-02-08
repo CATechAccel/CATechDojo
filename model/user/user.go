@@ -6,8 +6,8 @@ import (
 
 //インターフェースを定義
 type userInterface interface {
-	SelectAll() ([]UserData, error)
-	SelectUser(token string) (*UserData, error)
+	SelectAll() ([]UserEntity, error)
+	SelectUser(token string) (*UserEntity, error)
 	Insert() error
 	UpdateName(token string) error
 	GetName() string
@@ -15,26 +15,26 @@ type userInterface interface {
 }
 
 func New() userInterface {
-	return &UserData{}
+	return &UserEntity{}
 }
 
-func (u *UserData) GetName() string {
+func (u *UserEntity) GetName() string {
 	return u.Name
 }
 
-func (u *UserData) GetUserID() string {
+func (u *UserEntity) GetUserID() string {
 	return u.UserID
 }
 
-func (u *UserData) SelectAll() ([]UserData, error) {
+func (u *UserEntity) SelectAll() ([]UserEntity, error) {
 	rows, err := db.DBInstance.Query("SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
 
-	userSlice := make([]UserData, 0)
+	userSlice := make([]UserEntity, 0)
 	for rows.Next() {
-		var u UserData
+		var u UserEntity
 		if err := rows.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {
 			return nil, err
 		}
@@ -44,7 +44,7 @@ func (u *UserData) SelectAll() ([]UserData, error) {
 }
 
 // TODO: SelectUserByTokenみたいなわかりやすい名前をつける
-func (u *UserData) SelectUser(token string) (*UserData, error) {
+func (u *UserEntity) SelectUser(token string) (*UserEntity, error) {
 	row := db.DBInstance.QueryRow("SELECT * FROM users WHERE auth_token = ?", token)
 	if err := row.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {
 		return nil, err
@@ -52,14 +52,14 @@ func (u *UserData) SelectUser(token string) (*UserData, error) {
 	return u, nil
 }
 
-func (u *UserData) Insert() error {
+func (u *UserEntity) Insert() error {
 	if _, err := db.DBInstance.Exec("INSERT INTO users(user_id, auth_token, name) VALUES (?, ?, ?)", u.UserID, u.AuthToken, u.Name); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *UserData) UpdateName(token string) error {
+func (u *UserEntity) UpdateName(token string) error {
 	if _, err := db.DBInstance.Exec("UPDATE users SET name = ? WHERE auth_token = ?", u.Name, token); err != nil {
 		return err
 	}

@@ -6,20 +6,20 @@ import (
 
 // モデル層＝DBとのアクセスのみ関心をもつ（今回のプロジェクトでは）
 type characterInterface interface {
-	SelectByCharacterID(CharacterID string) (*CharacterData, error)
+	SelectByCharacterID(CharacterID string) (*CharacterEntity, error)
 	InsertCharacterData(userCharacterID string, userID string, HitCharacterID string) error
 	GetName() string
 }
 
 func New() characterInterface {
-	return &CharacterData{}
+	return &CharacterEntity{}
 }
 
-func (c *CharacterData) GetName() string {
+func (c *CharacterEntity) GetName() string {
 	return c.Name
 }
 
-func (c *CharacterData) SelectByCharacterID(CharacterID string) (*CharacterData, error) {
+func (c *CharacterEntity) SelectByCharacterID(CharacterID string) (*CharacterEntity, error) {
 	row := db.DBInstance.QueryRow("SELECT id, name, power FROM characters WHERE id = ?", CharacterID)
 	if err := row.Scan(&c.ID, &c.Name, &c.Power); err != nil {
 		return nil, err
@@ -27,7 +27,7 @@ func (c *CharacterData) SelectByCharacterID(CharacterID string) (*CharacterData,
 	return c, nil
 }
 
-func (g *CharacterData) InsertCharacterData(userCharacterID string, userID string, CharacterID string) error {
+func (g *CharacterEntity) InsertCharacterData(userCharacterID string, userID string, CharacterID string) error {
 	if _, err := db.DBInstance.Exec("INSERT INTO user_characters(user_character_id, user_id, character_id) VALUES (?, ?, ?)", userCharacterID, userID, CharacterID); err != nil {
 		return err
 	}

@@ -5,22 +5,22 @@ import (
 )
 
 type gachaInterface interface {
-	SelectAll() ([]OddsData, error)
+	SelectAll() ([]OddsEntity, error)
 }
 
 func New() gachaInterface {
-	return &OddsData{}
+	return &OddsEntity{}
 }
 
-func (g *OddsData) SelectAll() ([]OddsData, error) {
+func (g *OddsEntity) SelectAll() ([]OddsEntity, error) {
 	rows, err := db.DBInstance.Query("SELECT * FROM gacha_odds")
 	if err != nil {
 		return nil, err
 	}
 
-	oddsSlice := make([]OddsData, 0)
+	oddsSlice := make([]OddsEntity, 0)
 	for rows.Next() {
-		var g OddsData
+		var g OddsEntity
 		if err := rows.Scan(&g.CharacterID, &g.Odds); err != nil {
 			return nil, err
 		}

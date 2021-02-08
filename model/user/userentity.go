@@ -1,7 +1,6 @@
 package user
 
-//TODO: jsonの削除
-type UserData struct {
+type UserEntity struct {
 	UserID    string
 	AuthToken string
 	Name      string

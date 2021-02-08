@@ -79,7 +79,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	var reqBody user.UserData
+	var reqBody user.UserEntity
 	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -134,7 +134,7 @@ func ChangeName(w http.ResponseWriter, r *http.Request) {
 		errorResponse(err, w)
 	}
 
-	var u user.UserData
+	var u user.UserEntity
 	u.Name = reqBody.Name
 	if err := u.UpdateName(token); err != nil {
 		errorResponse(err, w)

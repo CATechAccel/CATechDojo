@@ -1,7 +1,6 @@
 package user_character
 
-type UserCharacterData struct {
+type UserCharacterEntity struct {
 	UserCharacterID string
 	CharacterID     string
 }
-

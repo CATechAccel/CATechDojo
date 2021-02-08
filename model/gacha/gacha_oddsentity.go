@@ -1,6 +1,6 @@
 package gacha
 
-type OddsData struct {
+type OddsEntity struct {
 	CharacterID string
 	Odds        int
 }
