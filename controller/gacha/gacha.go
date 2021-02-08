@@ -39,13 +39,6 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	//ユーザーキャラクターIDの作成
-	userCharacterID, err := util.CreateUUID()
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
 	//userIDの取得
 	u := user.New()
 	userData, err := u.SelectUserByToken(token)
@@ -92,6 +85,13 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		}
 
 		hitCharactersData = append(hitCharactersData, *hitCharacterData)
+
+		//ユーザーキャラクターIDの作成
+		userCharacterID, err := util.CreateUUID()
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 
 		if err := c.InsertCharacterData(userCharacterID, userData.UserID, hitCharacterID); err != nil {
 			log.Println(err)
