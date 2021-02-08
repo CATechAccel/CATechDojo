@@ -1,15 +1,12 @@
 package gacha
 
 import (
-	"CATechDojo/controller/request"
 	"CATechDojo/controller/response"
 	"CATechDojo/model/character"
 	"CATechDojo/model/gacha"
 	"CATechDojo/model/user"
 	"CATechDojo/service/util"
-	"bytes"
-	"encoding/json"
-	"io"
+	"CATechDojo/view"
 	"log"
 	"math/rand"
 	"net/http"
@@ -24,17 +21,8 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body := r.Body
-	defer body.Close()
-
-	buf := new(bytes.Buffer)
-	if _, err := io.Copy(buf, body); err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	var times request.Times
-	if err := json.Unmarshal(buf.Bytes(), &times); err != nil {
+	reqBody, err := view.ReadGachaDrawRequest(r)
+	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -60,7 +48,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 	//乱数を作成するための初期化
 	rand.Seed(time.Now().UnixNano())
 
-	for i := 0; i < times.Times; i++ {
+	for i := 0; i < reqBody.Times; i++ {
 		//乱数を作成
 		random := rand.Intn(oddsSum(odds))
 
@@ -108,14 +96,10 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 		hitCharacterSlice.Results = append(hitCharacterSlice.Results, res)
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	data, err := json.Marshal(hitCharacterSlice)
-	if err != nil {
+	if err := view.WriteResponse(w, hitCharacterSlice); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	_, _ = w.Write(data)
 }
 
 func oddsSum(odds []gacha.OddsEntity) int {

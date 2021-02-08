@@ -5,7 +5,7 @@ import (
 	"CATechDojo/model/character"
 	"CATechDojo/model/user"
 	"CATechDojo/model/user_character"
-	"encoding/json"
+	"CATechDojo/view"
 	"log"
 	"net/http"
 )
@@ -48,15 +48,8 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 		userCharacterResponseSlice = append(userCharacterResponseSlice, res)
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-
-	res := response.CharactersResponse{userCharacterResponseSlice}
-	data, err := json.Marshal(res)
-	if err != nil {
+	if err := view.WriteResponse(w, userCharacterResponseSlice); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	_, _ = w.Write(data)
-
 }
