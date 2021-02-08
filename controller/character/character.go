@@ -26,7 +26,7 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 
 	// user_idを用いてuser_character_id, character_idを取得
 	uc := user_character.New()
-	userCharacters, err := uc.SelectUserCharacters(u.GetUserID())
+	userCharacters, err := uc.SelectUserCharactersByUserID(u.GetUserID())
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
@@ -34,7 +34,7 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 	c := character.New()
 	var userCharacterResponseSlice []response.UserCharacterResponse
 	for _, userCharacter := range userCharacters {
-		_, err := c.SelectByCharacterID(userCharacter.CharacterID)
+		_, err := c.SelectCharacterByCharacterID(userCharacter.CharacterID)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)

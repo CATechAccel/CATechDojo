@@ -6,7 +6,7 @@ import (
 
 // モデル層＝DBとのアクセスのみ関心をもつ（今回のプロジェクトでは）
 type characterInterface interface {
-	SelectByCharacterID(CharacterID string) (*CharacterEntity, error)
+	SelectCharacterByCharacterID(CharacterID string) (*CharacterEntity, error)
 	InsertCharacterData(userCharacterID string, userID string, HitCharacterID string) error
 	GetName() string
 }
@@ -19,7 +19,7 @@ func (c *CharacterEntity) GetName() string {
 	return c.Name
 }
 
-func (c *CharacterEntity) SelectByCharacterID(CharacterID string) (*CharacterEntity, error) {
+func (c *CharacterEntity) SelectCharacterByCharacterID(CharacterID string) (*CharacterEntity, error) {
 	row := db.DBInstance.QueryRow("SELECT id, name, power FROM characters WHERE id = ?", CharacterID)
 	if err := row.Scan(&c.ID, &c.Name, &c.Power); err != nil {
 		return nil, err

@@ -85,7 +85,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 
 		//該当キャラクターのデータを取得
 		c := character.New()
-		hitCharacterData, err := c.SelectByCharacterID(hitCharacterID)
+		hitCharacterData, err := c.SelectCharacterByCharacterID(hitCharacterID)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)

@@ -3,14 +3,14 @@ package user_character
 import "CATechDojo/db"
 
 type userCharacterInterface interface {
-	SelectUserCharacters(UserID string) ([]UserCharacterEntity, error)
+	SelectUserCharactersByUserID(UserID string) ([]UserCharacterEntity, error)
 }
 
 func New() userCharacterInterface {
 	return &UserCharacterEntity{}
 }
 
-func (u *UserCharacterEntity) SelectUserCharacters(UserID string) ([]UserCharacterEntity, error) {
+func (u *UserCharacterEntity) SelectUserCharactersByUserID(UserID string) ([]UserCharacterEntity, error) {
 	rows, err := db.DBInstance.Query("SELECT user_character_id, character_id FROM user_characters WHERE user_id =?", UserID)
 	if err != nil {
 		return nil, err
