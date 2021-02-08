@@ -120,8 +120,8 @@ func ChangeName(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var u user.UserEntity
-	u.Name = reqBody.Name
-	if err := u.UpdateName(token); err != nil {
+	u.AuthToken = token
+	if err := u.UpdateName(reqBody.Name); err != nil {
 		errorResponse(err, w)
 	}
 }

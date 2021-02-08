@@ -48,8 +48,8 @@ func (u *UserEntity) Insert() error {
 	return nil
 }
 
-func (u *UserEntity) UpdateName(token string) error {
-	if _, err := db.DBInstance.Exec("UPDATE users SET name = ? WHERE auth_token = ?", u.Name, token); err != nil {
+func (u *UserEntity) UpdateName(name string) error {
+	if _, err := db.DBInstance.Exec("UPDATE users SET name = ? WHERE auth_token = ?", name, u.AuthToken); err != nil {
 		return err
 	}
 	return nil
