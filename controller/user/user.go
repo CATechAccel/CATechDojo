@@ -79,7 +79,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	var reqBody user.UserEntity
+	var reqBody request.UserRequest
 	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -97,16 +97,19 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	reqBody.UserID = userID
-	reqBody.AuthToken = authToken
+	newUser := user.UserEntity{
+		UserID:    userID,
+		AuthToken: authToken,
+		Name:      reqBody.Name,
+	}
 
-	if err := reqBody.Insert(); err != nil {
+	if err := newUser.Insert(); err != nil {
 		log.Println(err)
 		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
 	}
 
 	var res response.CreateUserResponse
-	res.Token = reqBody.AuthToken
+	res.Token = newUser.AuthToken
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
@@ -129,7 +132,7 @@ func ChangeName(w http.ResponseWriter, r *http.Request) {
 		errorResponse(err, w)
 	}
 
-	var reqBody request.UpdateNameRequest
+	var reqBody request.UserRequest
 	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
 		errorResponse(err, w)
 	}
