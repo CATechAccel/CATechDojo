@@ -10,20 +10,10 @@ type userInterface interface {
 	SelectUserByToken(token string) (*UserEntity, error)
 	Insert() error
 	UpdateName(token string) error
-	GetName() string
-	GetUserID() string
 }
 
 func New() userInterface {
 	return &UserEntity{}
-}
-
-func (u *UserEntity) GetName() string {
-	return u.Name
-}
-
-func (u *UserEntity) GetUserID() string {
-	return u.UserID
 }
 
 func (u *UserEntity) SelectAll() ([]UserEntity, error) {

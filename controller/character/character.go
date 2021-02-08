@@ -19,14 +19,15 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := user.New()
-	if _, err := u.SelectUserByToken(token); err != nil {
+	userData, err := u.SelectUserByToken(token)
+	if err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
 
 	// user_idを用いてuser_character_id, character_idを取得
 	uc := user_character.New()
-	userCharacters, err := uc.SelectUserCharactersByUserID(u.GetUserID())
+	userCharacters, err := uc.SelectUserCharactersByUserID(userData.UserID)
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
@@ -34,7 +35,7 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 	c := character.New()
 	var userCharacterResponseSlice []response.UserCharacterResponse
 	for _, userCharacter := range userCharacters {
-		_, err := c.SelectCharacterByCharacterID(userCharacter.CharacterID)
+		characterData, err := c.SelectCharacterByCharacterID(userCharacter.CharacterID)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
@@ -42,7 +43,7 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 		res := response.UserCharacterResponse{
 			UserCharacterID: userCharacter.UserCharacterID,
 			CharacterID:     userCharacter.CharacterID,
-			Name:            c.GetName(),
+			Name:            characterData.Name,
 		}
 		userCharacterResponseSlice = append(userCharacterResponseSlice, res)
 	}

@@ -8,15 +8,10 @@ import (
 type characterInterface interface {
 	SelectCharacterByCharacterID(CharacterID string) (*CharacterEntity, error)
 	InsertCharacterData(userCharacterID string, userID string, HitCharacterID string) error
-	GetName() string
 }
 
 func New() characterInterface {
 	return &CharacterEntity{}
-}
-
-func (c *CharacterEntity) GetName() string {
-	return c.Name
 }
 
 func (c *CharacterEntity) SelectCharacterByCharacterID(CharacterID string) (*CharacterEntity, error) {
