@@ -93,7 +93,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 
 		hitCharactersData = append(hitCharactersData, *hitCharacterData)
 
-		if err := c.InsertHitCharacterData(userCharacterID, userData.UserID, hitCharacterID); err != nil {
+		if err := c.InsertCharacterData(userCharacterID, userData.UserID, hitCharacterID); err != nil {
 			log.Println(err)
 			http.Error(w, "キャラクターデータを保存できませんでした", http.StatusInternalServerError)
 		}
