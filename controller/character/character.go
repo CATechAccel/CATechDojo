@@ -19,7 +19,7 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := user.New()
-	if _, err := u.SelectUser(token); err != nil {
+	if _, err := u.SelectUserByToken(token); err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}

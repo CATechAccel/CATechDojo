@@ -7,7 +7,7 @@ import (
 //インターフェースを定義
 type userInterface interface {
 	SelectAll() ([]UserEntity, error)
-	SelectUser(token string) (*UserEntity, error)
+	SelectUserByToken(token string) (*UserEntity, error)
 	Insert() error
 	UpdateName(token string) error
 	GetName() string
@@ -43,8 +43,7 @@ func (u *UserEntity) SelectAll() ([]UserEntity, error) {
 	return userSlice, nil
 }
 
-// TODO: SelectUserByTokenみたいなわかりやすい名前をつける
-func (u *UserEntity) SelectUser(token string) (*UserEntity, error) {
+func (u *UserEntity) SelectUserByToken(token string) (*UserEntity, error) {
 	row := db.DBInstance.QueryRow("SELECT * FROM users WHERE auth_token = ?", token)
 	if err := row.Scan(&u.UserID, &u.AuthToken, &u.Name); err != nil {
 		return nil, err

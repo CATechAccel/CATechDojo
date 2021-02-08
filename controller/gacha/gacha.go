@@ -48,7 +48,7 @@ func Draw(w http.ResponseWriter, r *http.Request) {
 
 	//userIDの取得
 	u := user.New()
-	userData, err := u.SelectUser(token)
+	userData, err := u.SelectUserByToken(token)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
