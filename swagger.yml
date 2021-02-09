@@ -15,6 +15,8 @@ tags:
     description: "ガチャ関連API"
   - name: "character"
     description: "キャラクター関連API"
+  - name: "ranking"
+    description: "ランキング関連API"
 schemes:
   - "http"
 paths:
@@ -146,6 +148,22 @@ paths:
           "schema":
             "$ref": "#/definitions/CharacterListResponse"
 
+  /ranking:
+    get:
+      tags:
+        - "ranking"
+      summary: "ユーザランキング取得API"
+      description: "ユーザが所持しているキャラクターのパワー値の合計で降順にソートしたユーザランキングを取得します。"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        200:
+          "description": "A successful response."
+          "schema":
+            "$ref": "#/definitions/RankingListResponse"
+
 definitions:
   UserCreateRequest:
     type: "object"
@@ -212,3 +230,19 @@ definitions:
       name:
         type: "string"
         description: "キャラクター名"
+  RankingListResponse:
+    type: "object"
+    properties:
+      ranking:
+        type: "array"
+        items:
+          $ref: "#/definitions/Ranking"
+  Ranking:
+    type: "object"
+    properties:
+      userName:
+        type: "string"
+        description: "ユーザ名"
+      point:
+        type: "string"
+        description: "ポイント（キャラクターのパワー合計値）"
