@@ -5,7 +5,7 @@ import (
 	"CATechDojo/model/character"
 	"CATechDojo/model/user"
 	"CATechDojo/model/user_character"
-	"encoding/json"
+	"CATechDojo/view"
 	"log"
 	"net/http"
 )
@@ -19,14 +19,15 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := user.New()
-	if err := u.SelectUser(token); err != nil {
+	userData, err := u.SelectUserByToken(token)
+	if err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
 
 	// user_idを用いてuser_character_id, character_idを取得
 	uc := user_character.New()
-	userCharacters, err := uc.SelectUserCharacters(u.GetUserID())
+	userCharacters, err := uc.SelectUserCharactersByUserID(userData.UserID)
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
@@ -34,7 +35,7 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 	c := character.New()
 	var userCharacterResponseSlice []response.UserCharacterResponse
 	for _, userCharacter := range userCharacters {
-		err := c.SelectCharacterByCharacterID(userCharacter.CharacterID)
+		characterData, err := c.SelectCharacterByCharacterID(userCharacter.CharacterID)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
@@ -42,20 +43,13 @@ func ShowUserCharacters(w http.ResponseWriter, r *http.Request) {
 		res := response.UserCharacterResponse{
 			UserCharacterID: userCharacter.UserCharacterID,
 			CharacterID:     userCharacter.CharacterID,
-			Name:            c.GetName(),
+			Name:            characterData.Name,
 		}
 		userCharacterResponseSlice = append(userCharacterResponseSlice, res)
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-
-	res := response.CharactersResponse{userCharacterResponseSlice}
-	data, err := json.Marshal(res)
-	if err != nil {
+	if err := view.WriteResponse(w, userCharacterResponseSlice); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	_, _ = w.Write(data)
-
 }

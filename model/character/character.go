@@ -4,62 +4,27 @@ import (
 	"CATechDojo/db"
 )
 
+// モデル層＝DBとのアクセスのみ関心をもつ（今回のプロジェクトでは）
 type characterInterface interface {
-	SelectCharacterByCharacterID(CharacterID string) error
-	GetName() string
+	SelectCharacterByCharacterID(CharacterID string) (*CharacterEntity, error)
+	InsertCharacterData(userCharacterID string, userID string, HitCharacterID string) error
 }
 
 func New() characterInterface {
-	return &CharacterData{}
+	return &CharacterEntity{}
 }
 
-func (c *CharacterData) GetName() string {
-	return c.Name
-}
-
-func (c *CharacterData) SelectCharacterByCharacterID(CharacterID string) error {
+func (c *CharacterEntity) SelectCharacterByCharacterID(CharacterID string) (*CharacterEntity, error) {
 	row := db.DBInstance.QueryRow("SELECT id, name, power FROM characters WHERE id = ?", CharacterID)
 	if err := row.Scan(&c.ID, &c.Name, &c.Power); err != nil {
-		return  err
+		return nil, err
+	}
+	return c, nil
+}
+
+func (g *CharacterEntity) InsertCharacterData(userCharacterID string, userID string, CharacterID string) error {
+	if _, err := db.DBInstance.Exec("INSERT INTO user_characters(user_character_id, user_id, character_id) VALUES (?, ?, ?)", userCharacterID, userID, CharacterID); err != nil {
+		return err
 	}
 	return nil
 }
-
-/*
-
-func SelectUserID(token string) (string, error) {
-	var userID string
-	row := db.DBInstance.QueryRow("SELECT user_id FROM users WHERE auth_token = ?", token)
-	if err := row.Scan(&userID); err != nil {
-		return "", err
-	}
-	return userID, nil
-}
-
-func SelectUserCharacters(UserID string) ([]UserCharacterData, error) {
-	rows, err := db.DBInstance.Query("SELECT user_character_id, character_id FROM user_characters WHERE user_id =?", UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	userCharacterSlice := make([]UserCharacterData, 0)
-	for rows.Next() {
-		var u UserCharacterData
-		if err := rows.Scan(&u.UserCharacterID, &u.CharacterID); err != nil {
-			return nil, err
-		}
-		userCharacterSlice = append(userCharacterSlice, u)
-	}
-	return userCharacterSlice, nil
-}
-
-func SelectCharacterName(CharacterID string) (string, error) {
-	var c UserCharacterData
-	row := db.DBInstance.QueryRow("SELECT name FROM characters WHERE id = ?", CharacterID)
-	if err := row.Scan(&c.Name); err != nil {
-		return "", err
-	}
-	return c.Name, nil
-}
-
-*/

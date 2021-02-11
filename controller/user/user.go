@@ -1,27 +1,21 @@
 package user
 
 import (
-	"CATechDojo/controller/request"
 	"CATechDojo/controller/response"
 	"CATechDojo/model/user"
 	"CATechDojo/service/util"
-	"bytes"
+	"CATechDojo/view"
 	"encoding/json"
-	"io"
 	"log"
 	"net/http"
 )
 
 func GetAll(w http.ResponseWriter, r *http.Request) {
 	u := user.New()
-
 	users, err := u.SelectAll()
 	if err != nil {
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
 
 	var userSlice response.GetAllUserRespponse
 	for _, userdata := range users {
@@ -32,11 +26,10 @@ func GetAll(w http.ResponseWriter, r *http.Request) {
 		userSlice.Users = append(userSlice.Users, res)
 	}
 
-	data, err := json.Marshal(userSlice)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+	if err := view.WriteResponse(w, userSlice); err != nil {
+		log.Println(err)
+		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
-	_, _ = w.Write(data)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
@@ -48,8 +41,8 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u := user.New()
-
-	if err := u.SelectUser(token); err != nil {
+	userData, err := u.SelectUserByToken(token)
+	if err != nil {
 		log.Println(err)
 		http.Error(w, "データを参照できませんでした", http.StatusInternalServerError)
 	}
@@ -58,7 +51,12 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	res := response.GetUserResponse{
-		Name: u.GetName(),
+		Name: userData.Name,
+	}
+
+	if err := view.WriteResponse(w, res); err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 	data, err := json.Marshal(res)
@@ -70,17 +68,8 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
-	body := r.Body
-	defer body.Close()
-
-	buf := new(bytes.Buffer)
-	if _, err := io.Copy(buf, body); err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-
-	var reqBody user.UserData
-	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
+	reqBody, err := view.ReadUserRequest(r)
+	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -97,46 +86,42 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	reqBody.UserID = userID
-	reqBody.AuthToken = authToken
+	newUser := user.UserEntity{
+		UserID:    userID,
+		AuthToken: authToken,
+		Name:      reqBody.Name,
+	}
 
-	if err := reqBody.Insert(); err != nil {
+	if err := newUser.Insert(); err != nil {
 		log.Println(err)
 		http.Error(w, "ユーザデータを保存できませんでした", http.StatusInternalServerError)
 	}
 
 	var res response.CreateUserResponse
-	res.Token = reqBody.AuthToken
-
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusOK)
-	data, err := json.Marshal(res)
-	if err != nil {
+	res.Token = newUser.AuthToken
+	if err := view.WriteResponse(w, res); err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	_, _ = w.Write(data)
 }
 
 func ChangeName(w http.ResponseWriter, r *http.Request) {
 	token := r.Header.Get("x-token")
-
-	body := r.Body
-	defer body.Close()
-
-	buf := new(bytes.Buffer)
-	if _, err := io.Copy(buf, body); err != nil {
-		errorResponse(err, w)
+	if token == "" {
+		log.Println("トークンの値がnilです")
+		http.Error(w, "認証情報が必要です。", http.StatusBadRequest)
+		return
 	}
 
-	var reqBody request.UpdateNameRequest
-	if err := json.Unmarshal(buf.Bytes(), &reqBody); err != nil {
-		errorResponse(err, w)
+	reqBody, err := view.ReadUserRequest(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	var u user.UserData
-	u.Name = reqBody.Name
-	if err := u.UpdateName(token); err != nil {
+	var u user.UserEntity
+	u.AuthToken = token
+	if err := u.UpdateName(reqBody.Name); err != nil {
 		errorResponse(err, w)
 	}
 }

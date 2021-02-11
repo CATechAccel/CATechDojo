@@ -1,6 +1,6 @@
 package character
 
-type CharacterData struct {
+type CharacterEntity struct {
 	ID    string
 	Name  string
 	Power int
